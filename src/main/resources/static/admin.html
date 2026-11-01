@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--
+===================================================================
+File: admin.html
+Description: Admin dashboard for slot CRUD, pricing configuration, and analytics.
+Syllabus Topics Demonstrated:
+  - Module IV.1: Administrative RESTful Web Services consumption
+  - Module IV.2: Front-End UI layer
+===================================================================
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Smart Parking System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>⚙️ Smart Parking - Admin Dashboard</h1>
+            <nav>
+                <a href="customer.html">Customer View</a>
+                <a href="admin.html">Admin Panel</a>
+            </nav>
+        </header>
+
+        <div id="adminAlertBox" class="alert"></div>
+
+        <!-- Feature 4: View Simple Statistics -->
+        <div class="card">
+            <h2>1. System Overview & Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>Total Bookings</div>
+                    <div id="statTotalBookings" class="value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Total Revenue</div>
+                    <div id="statTotalRevenue" class="value">Rs. 0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div>Occupied Slots</div>
+                    <div id="statOccupiedSlots" class="value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Available Slots</div>
+                    <div id="statAvailableSlots" class="value">0</div>
+                </div>
+            </div>
+            <button onclick="loadStatistics()" style="margin-top: 10px;">Refresh Stats</button>
+        </div>
+
+        <!-- Feature 2: Set / Change Price per hour for CAR and BIKE -->
+        <div class="card">
+            <h2>2. Hourly Price Settings</h2>
+            <div style="margin-bottom: 15px;">
+                <strong>Current Rates:</strong>
+                CAR: <span id="currentCarRate" style="color: #2980b9; font-weight: bold;">Loading...</span> | 
+                BIKE: <span id="currentBikeRate" style="color: #2980b9; font-weight: bold;">Loading...</span>
+            </div>
+            <form id="priceForm" class="form-row">
+                <div class="form-group">
+                    <label for="priceVehicleType">Vehicle Type</label>
+                    <select id="priceVehicleType" required>
+                        <option value="CAR">CAR</option>
+                        <option value="BIKE">BIKE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pricePerHour">Price Per Hour (Rs)</label>
+                    <input type="number" step="0.5" id="pricePerHour" placeholder="e.g. 35.0" required>
+                </div>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <button type="submit">Update Price Rate</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Feature 1: Add, Update and Delete Parking Slots (CRUD) -->
+        <div class="card">
+            <h2>3. Manage Parking Slots (CRUD)</h2>
+            <form id="slotForm" class="form-row" style="background-color: #f9f9f9; padding: 12px; border-radius: 6px;">
+                <input type="hidden" id="editSlotId">
+                <div class="form-group">
+                    <label for="slotNumber">Slot Number</label>
+                    <input type="text" id="slotNumber" placeholder="e.g. S-6" required>
+                </div>
+                <div class="form-group">
+                    <label for="slotVehicleType">Vehicle Type</label>
+                    <select id="slotVehicleType" required>
+                        <option value="CAR">CAR</option>
+                        <option value="BIKE">BIKE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="slotStatus">Status</label>
+                    <select id="slotStatus" required>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="BOOKED">BOOKED</option>
+                    </select>
+                </div>
+                <div class="form-group" style="justify-content: flex-end; display: flex; flex-direction: row; gap: 8px;">
+                    <button type="submit" id="slotSubmitBtn">Add Slot</button>
+                    <button type="button" id="cancelEditBtn" style="display:none; background:#7f8c8d;">Cancel</button>
+                </div>
+            </form>
+
+            <table style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Slot Number</th>
+                        <th>Vehicle Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="slotsTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Feature 3: View All Booking Records -->
+        <div class="card">
+            <h2>4. All Booking Records</h2>
+            <button onclick="loadAllBookings()" style="margin-bottom: 12px;">Refresh Records</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Type</th>
+                        <th>Slot</th>
+                        <th>Entry Time</th>
+                        <th>Exit Time</th>
+                        <th>Fare (Rs)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Page JavaScript -->
+    <script src="admin.js"></script>
+</body>
+</html>

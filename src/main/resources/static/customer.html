@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!--
+===================================================================
+File: customer.html
+Description: Customer web page for slot booking, real-time status, and checkout.
+Syllabus Topics Demonstrated:
+  - Module IV.1: Consuming RESTful Web Services via JavaScript Fetch API
+  - Module IV.2: Front-End UI layer in Spring Boot static web resources
+===================================================================
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer - Smart Parking System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <header>
+            <h1>🚗 Smart Parking - Customer Portal</h1>
+            <nav>
+                <a href="customer.html">Customer View</a>
+                <a href="admin.html">Admin Panel</a>
+            </nav>
+        </header>
+
+        <!-- Feature 2: Real-time Available Slots Count Banner -->
+        <div class="counter-box">
+            Available Parking Slots (Real-Time): <strong id="availableCount">Loading...</strong>
+            <span style="font-size: 12px; color: #777; margin-left: 10px;">(Auto-refreshes every 5s)</span>
+        </div>
+
+        <!-- Global Message / Alert Box -->
+        <div id="alertBox" class="alert"></div>
+
+        <!-- Feature 1: View All Parking Slots with Status & Vehicle Type -->
+        <div class="card">
+            <h2>1. Parking Slots Availability</h2>
+            <div id="slotsGrid" class="slots-grid">
+                <!-- Dynamically populated by customer.js -->
+            </div>
+        </div>
+
+        <!-- Feature 3: Reserve a Parking Slot -->
+        <div class="card">
+            <h2>2. Reserve a Parking Slot</h2>
+            <form id="reserveForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customerName">Your Full Name</label>
+                        <input type="text" id="customerName" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleNumber">Vehicle Number</label>
+                        <input type="text" id="vehicleNumber" placeholder="e.g. KA-01-AB-1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type</label>
+                        <select id="vehicleType" required>
+                            <option value="CAR">CAR</option>
+                            <option value="BIKE">BIKE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="slotSelect">Choose Slot</label>
+                        <select id="slotSelect" required>
+                            <option value="">-- Select Available Slot --</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">Confirm Reservation</button>
+            </form>
+        </div>
+
+        <!-- Feature 4: Check Out (Release Slot & Calculate Fare) -->
+        <div class="card">
+            <h2>3. Vehicle Check-Out & Fare Payment</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                Enter your occupied slot number to exit and view the calculated fare.
+            </p>
+            <form id="checkoutForm" class="form-row">
+                <div class="form-group" style="max-width: 250px;">
+                    <label for="checkoutSlotNumber">Slot Number</label>
+                    <input type="text" id="checkoutSlotNumber" placeholder="e.g. S-1" required>
+                </div>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <button type="submit">Complete Check-Out</button>
+                </div>
+            </form>
+            <div id="checkoutResult" style="margin-top: 12px; font-weight: bold; color: #27ae60;"></div>
+
+            <!-- Customer Receipt Card -->
+            <div id="receiptCard" class="receipt-card" style="display: none;">
+                <div class="receipt-header">
+                    <h3>🅿️ PARKING RECEIPT</h3>
+                    <p>Smart Parking Management System</p>
+                    <span id="receiptDate" style="font-size: 11px; color: #888;"></span>
+                </div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-body">
+                    <div class="receipt-row"><span>Booking ID:</span><strong id="receiptId"></strong></div>
+                    <div class="receipt-row"><span>Customer Name:</span><span id="receiptCustomer"></span></div>
+                    <div class="receipt-row"><span>Vehicle Number:</span><strong id="receiptVehicle"></strong></div>
+                    <div class="receipt-row"><span>Vehicle Type:</span><span id="receiptType"></span></div>
+                    <div class="receipt-row"><span>Slot Number:</span><span id="receiptSlot"></span></div>
+                    <div class="receipt-row"><span>Entry Time:</span><span id="receiptEntry"></span></div>
+                    <div class="receipt-row"><span>Exit Time:</span><span id="receiptExit"></span></div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-row total"><span>TOTAL FARE PAID:</span><strong id="receiptAmount"></strong></div>
+                    <div class="receipt-row" style="margin-top: 6px;"><span>Payment Status:</span><span class="paid-badge">PAID</span></div>
+                </div>
+                <div class="receipt-actions">
+                    <button type="button" onclick="window.print()" class="print-btn">🖨️ Print Receipt</button>
+                    <button type="button" onclick="document.getElementById('receiptCard').style.display='none'" class="close-btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 5: View Booking History by Vehicle Number -->
+        <div class="card">
+            <h2>4. My Booking History</h2>
+            <form id="historyForm" class="form-row">
+                <div class="form-group" style="max-width: 250px;">
+                    <label for="searchVehicleNumber">Search by Vehicle Number</label>
+                    <input type="text" id="searchVehicleNumber" placeholder="e.g. KA-01-AB-1234" required>
+                </div>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <button type="submit">Search Records</button>
+                </div>
+            </form>
+
+            <table id="historyTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Vehicle</th>
+                        <th>Type</th>
+                        <th>Slot</th>
+                        <th>Entry Time</th>
+                        <th>Exit Time</th>
+                        <th>Fare (Rs)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Page JavaScript -->
+    <script src="customer.js"></script>
+</body>
+</html>
